@@ -7,6 +7,8 @@ public class EnemyMovement : MonoBehaviour
 {
     // ---- SCRIPTS ---- //
     EnemyStateMachine enemyStateMachine;
+    EnemyAnimator enemyAnimator;
+
     public Transform target;
     public float speed = 3f;
     public float rotationSpeed = 5f;
@@ -15,6 +17,7 @@ public class EnemyMovement : MonoBehaviour
 
     private Rigidbody rb;
     public int currentWaypointIndex = 0;
+    private bool enemyMovementLocked;
 
     private void Awake()
     {
@@ -57,6 +60,10 @@ public class EnemyMovement : MonoBehaviour
     {
         if (target == null) return;
 
+        if (enemyStateMachine.state == EnemyStateMachine.State.Attack) return;
+
+        if (enemyMovementLocked) return;
+
         Vector3 direction = (target.position - transform.position).normalized;
         direction.y = 0f;
 
@@ -68,5 +75,35 @@ public class EnemyMovement : MonoBehaviour
 
         Vector3 move = direction * speed * Time.fixedDeltaTime;
         rb.MovePosition(rb.position + move);
+    }
+
+    void MoveRight()
+    {
+        Vector3 move = transform.right * speed * Time.fixedDeltaTime;
+        rb.MovePosition(rb.position + move);
+    }
+
+    void MoveLeft()
+    {
+        Vector3 move = -transform.right * speed * Time.fixedDeltaTime;
+        rb.MovePosition(rb.position + move);
+    }
+
+    void MoveBack()
+    {
+        Vector3 move = -transform.forward * speed * Time.fixedDeltaTime;
+        rb.MovePosition(rb.position + move);
+    }
+
+    public void movementLock()
+    {
+        enemyMovementLocked = true;
+        enemyStateMachine.ChangeState(EnemyStateMachine.State.Idle);
+    }
+
+    public void movementUnlock() 
+    {
+        enemyMovementLocked = false;
+        enemyStateMachine.ChangeState(EnemyStateMachine.State.Patrol);
     }
 }

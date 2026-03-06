@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class EnemyAnimator : MonoBehaviour
 {
@@ -14,7 +14,7 @@ public class EnemyAnimator : MonoBehaviour
 
     private void Update()
     {
-        if (enemyStateMachine.state == EnemyStateMachine.State.Idle)
+        /*if (enemyStateMachine.state == EnemyStateMachine.State.Idle)
         {
             animator.SetInteger("State", 0);
         }
@@ -25,11 +25,12 @@ public class EnemyAnimator : MonoBehaviour
         else if (enemyStateMachine.state == EnemyStateMachine.State.Chase)
         {
             animator.SetInteger("State", 3);
-        }
+        }*/
     }
 
     public void PlayAttack()
     {
+        Debug.Log("Play Attack çağrıldı");
         animator.SetTrigger("Attack");
     }
 }

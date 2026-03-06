@@ -5,7 +5,7 @@ using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 public class EnemySensor : MonoBehaviour
 {
     public Transform player;
-    float distance;                         //Distance to Player
+    public float distance;                  //Distance to Player
     Vector3 direction;                      //Direction to Player
     public float detectionRange = 10f;
     public float chaseStopDistance = 15f;
@@ -15,17 +15,19 @@ public class EnemySensor : MonoBehaviour
 
     // ---- SCRIPTS ---- //
     EnemyMovement enemyMovement;
+    EnemyStateMachine enemyStateMachine;
 
     private void Awake()
     {
         enemyMovement = GetComponent<EnemyMovement>();
+        enemyStateMachine = GetComponent<EnemyStateMachine>();
     }
     private void Update()
     {
         // ---- UPDATING VARIABLES ----
 
         distance = Vector3.Distance(transform.position, player.position); //Distance to Player is updated
-        direction = (player.position - transform.position).normalized; // //Direction to Player is updated
+        direction = (player.position - transform.position).normalized;    //Direction to Player is updated
 
         if (lockedOn && distance >= chaseStopDistance)
         {
@@ -66,5 +68,6 @@ public class EnemySensor : MonoBehaviour
     {
         lockedOn = false;
         enemyMovement.target = waypointCache;
+        enemyStateMachine.ChangeState(EnemyStateMachine.State.Patrol);
     }
 }
