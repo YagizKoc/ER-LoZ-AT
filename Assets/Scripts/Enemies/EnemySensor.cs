@@ -9,6 +9,7 @@ public class EnemySensor : MonoBehaviour
     Vector3 direction;                      //Direction to Player
     public float detectionRange = 10f;
     public float chaseStopDistance = 15f;
+    public float enemyStopDistance;
     public LayerMask obstacleMask;
     public bool lockedOn;
     private Transform waypointCache;
@@ -34,12 +35,17 @@ public class EnemySensor : MonoBehaviour
           LockOff();
         }
 
-        if (distance <= detectionRange && !lockedOn)
+        if (distance <= detectionRange && !lockedOn && enemyStateMachine.state != EnemyStateMachine.State.Idle)
         { 
           CastRay(); 
         }
-        
-        
+
+
+        if (distance < enemyStopDistance & !(enemyStateMachine.state == EnemyStateMachine.State.Attack))
+        {
+            enemyMovement.movementLock();
+        }
+
     }
 
     void CastRay()
@@ -62,6 +68,7 @@ public class EnemySensor : MonoBehaviour
         lockedOn = true;
         waypointCache = enemyMovement.target;
         enemyMovement.target = player;
+        enemyStateMachine.ChangeState(EnemyStateMachine.State.Chase);
     }
 
     void LockOff() 

@@ -17,9 +17,11 @@ public class PlayerController : MonoBehaviour
     Quaternion dodgeTargetRot;
     bool rotateToDodge;
     public int comboIndex;
+    public bool isRunning;
+    private float runMultiplier = 1.35f;
 
     [Header("Rotation Lock (prevents jitter)")]
-    public float lockOnRotationHoldAfterDodge = 0.15f; // 0.12-0.20 iyi
+    public float lockOnRotationHoldAfterDodge = 0.15f;
     float lockOnRotationHoldTimer = 0f;
 
     PlayerMotor motor;
@@ -241,4 +243,5 @@ public class PlayerController : MonoBehaviour
         attack.OnAttackStart -= animDriver.TriggerAttack;
     }
 
+ 
 }

@@ -1,8 +1,11 @@
 using UnityEngine;
 using System;
+using TMPro;
 
 public class CharacterStats : MonoBehaviour
 {
+    [SerializeField] TMP_Text healthText;
+
     [Header("Stamina")]
     public float maxStamina = 100f;
     public float staminaRegenPerSec = 20f;
@@ -54,6 +57,7 @@ public class CharacterStats : MonoBehaviour
 
         HP -= dmg;
         Debug.Log("Player HP: " + HP);
+        OnHealthChanged?.Invoke(HP, maxHP);
 
         if (HP <= 0)
         {

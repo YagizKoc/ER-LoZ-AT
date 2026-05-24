@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class EnemyBrain : MonoBehaviour
 {
@@ -6,6 +6,7 @@ public class EnemyBrain : MonoBehaviour
     EnemyMovement enemyMovement;
     EnemySensor enemySensor;
     EnemyStateMachine enemyStateMachine;
+    EnemyAttack enemyAttack;
 
     public float enemyAttackCoolDown;
     float decisionTimer;
@@ -16,6 +17,7 @@ public class EnemyBrain : MonoBehaviour
         enemyStateMachine = GetComponent<EnemyStateMachine>();
         enemyMovement = GetComponent<EnemyMovement>();
         enemySensor = GetComponent<EnemySensor>();
+        enemyAttack = GetComponent<EnemyAttack>();
     }
     private void Start()
     {
@@ -24,13 +26,6 @@ public class EnemyBrain : MonoBehaviour
 
     private void Update()
     {
-        if (enemyMovement.target != null)
-        {
-            if (enemyMovement.target.CompareTag("Player") & enemyStateMachine.state != EnemyStateMachine.State.Attack)
-            {
-                enemyStateMachine.ChangeState(EnemyStateMachine.State.Chase);
-            }
-        }
 
         decisionTimer -= Time.deltaTime;
 
@@ -43,18 +38,29 @@ public class EnemyBrain : MonoBehaviour
 
     int Roll(int range) // You gotta set a range, every act counts on different intervels
     {
-        return Random.Range(0, range);
+        return Random.Range(1, range);
     }
 
     void TryDecision()
     {
-        if (enemySensor.distance <= 10)
+        if (enemySensor.distance <= enemySensor.detectionRange)
         {
-            int roll = Roll(5);
-
+            int roll = Roll(10);
+            Debug.Log("Roll: " + roll + " geldi");
             if (roll < 2)
             {
                 enemyMovement.movementLock();
+                Debug.Log("Movement lock çalıştı");
+            }
+            if (roll >= 2 & roll >=3)
+            {
+                enemyMovement.movementUnlock();
+                Debug.Log("Movement unlock çalıştı");
+            }
+            if (enemySensor.distance <= enemyAttack.meleeAttackRange & roll >= 4)
+            {
+                enemyAttack.Attack();
+                Debug.Log("Attack çalıştı");
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(Rigidbody))]
 public class EnemyMovement : MonoBehaviour
@@ -16,21 +17,31 @@ public class EnemyMovement : MonoBehaviour
     public List<Transform> waypoints;
 
     private Rigidbody rb;
+    NavMeshAgent agent;
     public int currentWaypointIndex = 0;
-    private bool enemyMovementLocked;
+    public bool enemyMovementLocked; //
 
     private void Awake()
     {
         enemyStateMachine = GetComponent<EnemyStateMachine>();
         rb = GetComponent<Rigidbody>();
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        agent = GetComponent<NavMeshAgent>();
     }
 
     private void FixedUpdate()
     {
         WaypointCheck();
-
-        EnemyMove();
+        if (enemyStateMachine.state == EnemyStateMachine.State.Attack || enemyStateMachine.state == EnemyStateMachine.State.Idle)
+        {
+            agent.isStopped = true;
+        }
+        else
+        {
+            agent.isStopped = false;
+            agent.SetDestination(target.position);
+        }
+        //EnemyMove();
     }
 
     public Transform GetToNextWaypoint()
@@ -62,7 +73,7 @@ public class EnemyMovement : MonoBehaviour
 
         if (enemyStateMachine.state == EnemyStateMachine.State.Attack) return;
 
-        if (enemyMovementLocked) return;
+        
 
         Vector3 direction = (target.position - transform.position).normalized;
         direction.y = 0f;
@@ -70,11 +81,14 @@ public class EnemyMovement : MonoBehaviour
         if (direction.sqrMagnitude > 0.001f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(direction);
+
             rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
         }
 
+        if (enemyMovementLocked | enemyStateMachine.state == EnemyStateMachine.State.Attack) return;
         Vector3 move = direction * speed * Time.fixedDeltaTime;
         rb.MovePosition(rb.position + move);
+
     }
 
     void MoveRight()
@@ -104,6 +118,6 @@ public class EnemyMovement : MonoBehaviour
     public void movementUnlock() 
     {
         enemyMovementLocked = false;
-        enemyStateMachine.ChangeState(EnemyStateMachine.State.Patrol);
+        enemyStateMachine.ChangeState(EnemyStateMachine.State.Chase);
     }
 }
